@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: social-network-ml-client
+spec:
+  containers:
+  - name: social-network-ml-client
+    image: localhost:5000/social-network-ml-client:latest
+    command: ["python3"]
+    args: ["/workspace/sleep.py"]

@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: locust-worker
+  labels:
+    name: locust
+    role: worker
+spec:
+  selector:
+    matchLabels:
+      name: locust
+      role: worker
+  replicas: 20
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        name: locust
+        role: worker
+    spec:
+      securityContext: {}
+      containers:
+      - name: locust-worker
+        securityContext: {}
+        image: "localhost:5000/locust-ml:latest"
+        command: ["/bin/bash", "/docker-entrypoint.sh"]
+        # args: ["--config=/mnt/locust/configs/worker.conf"]
+        imagePullPolicy: Always
+        resources: {}
+      restartPolicy: Always

@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{"prometheus.io/port":"9153","prometheus.io/scrape":"true"},"labels":{"addonmanager.kubernetes.io/mode":"Reconcile","k8s-app":"kube-dns","kubernetes.io/cluster-service":"true","kubernetes.io/name":"kube-dns"},"name":"kube-dns","namespace":"kube-system"},"spec":{"clusterIP":"10.233.0.3","ports":[{"name":"dns","port":53,"protocol":"UDP"},{"name":"dns-tcp","port":53,"protocol":"TCP"},{"name":"metrics","port":9153,"protocol":"TCP"}],"selector":{"k8s-app":"kube-dns"}}}
+    prometheus.io/port: "9153"
+    prometheus.io/scrape: "true"
+  creationTimestamp: "2021-11-10T22:23:53Z"
+  labels:
+    addonmanager.kubernetes.io/mode: Reconcile
+    k8s-app: kube-dns
+    kubernetes.io/cluster-service: "true"
+    kubernetes.io/name: kube-dns
+  name: kube-dns
+  namespace: kube-system
+  resourceVersion: "361"
+  uid: 3d958328-ed35-44d4-80c7-51bf65adce5f
+spec:
+  clusterIP: 10.233.0.3
+  clusterIPs:
+  - 10.233.0.3
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: dns
+    port: 53
+    protocol: UDP
+    targetPort: 53
+  - name: dns-tcp
+    port: 53
+    protocol: TCP
+    targetPort: 53
+  - name: metrics
+    port: 9153
+    protocol: TCP
+    targetPort: 9153
+  selector:
+    k8s-app: kube-dns
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}

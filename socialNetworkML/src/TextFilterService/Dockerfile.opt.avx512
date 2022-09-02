@@ -1,0 +1,51 @@
+FROM tensorflow/tensorflow:devel
+
+ENV http_proxy=""
+ENV https_proxy=""
+ENV no_proxy=""
+
+WORKDIR /tensorflow_src
+
+# build tensorflow 2 with avx512 support from source
+RUN git checkout r2.5
+RUN yes "" | python configure.py
+RUN bazel build --config=opt --copt=-mavx --copt=-mavx2 --copt=-mfma \
+    --copt=-mavx512f --copt=-mavx512cd \
+    --local_cpu_resources=HOST_CPUS*.5 //tensorflow/tools/pip_package:build_pip_package && \
+    ./bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/pip && \
+    pip install --no-cache-dir /tmp/pip/tensorflow-2.5.0-cp36-cp36m-linux_x86_64.whl && \
+    rm -rf /root/.cache
+WORKDIR /
+
+# install TextFilterService
+COPY requirements.txt /social-network-microservices/requirements.txt
+COPY src/TextFilterService /social-network-microservices/src/TextFilterService
+COPY third_party /social-network-microservices/third_party
+COPY gen-cpp /social-network-microservices/gen-cpp
+COPY gen-lua /social-network-microservices/gen-lua
+COPY gen-py /social-network-microservices/gen-py
+COPY config /social-network-microservices/config
+COPY keys /keys
+
+RUN pip install --no-cache-dir -r /social-network-microservices/requirements.txt
+RUN pip install --no-cache-dir joblib==1.0.0 numpy==1.19.5 pandas==1.0.5 scikit-learn==0.24.0 textblob==0.15.3
+RUN pip install --no-cache-dir transformers==4.8.2
+# Installing transformers from source (with intel-tensorflow-avx512 support)
+# RUN apt-get update && apt-get install -y git
+# RUN pip install git+https://github.com/huggingface/transformers.git@fbf1397bf862597aad9f09779abfd5d5d3d84975
+
+# Warm up: download and cache models
+RUN python -m textblob.download_corpora
+RUN python /social-network-microservices/src/TextFilterService/TextFilterService_cache_models.py
+
+# Run Transformers in a firewalled or a no-network environment.
+ENV HF_DATASETS_OFFLINE=1
+ENV TRANSFORMERS_OFFLINE=1
+
+WORKDIR /social-network-microservices/src/TextFilterService
+# ENV TF_ENABLE_ONEDNN_OPTS=1
+# ENV OMP_NUM_THREADS=8
+# ENV KMP_AFFINITY=granularity=fine,verbose,compact,1,0
+# ENV KMP_AFFINITY=granularity=fine,none,1,0
+# ENTRYPOINT ["python", "TextFilterService.py", "--num_intra_threads=8", "--num_inter_threads=2"]
+ENTRYPOINT ["python", "TextFilterService.py"]

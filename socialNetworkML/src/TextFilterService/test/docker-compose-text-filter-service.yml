@@ -1,0 +1,14 @@
+# replace registry url
+version: "3"
+services:
+  text-filter-service:
+    image: localhost:5000/social-network-text-filter-service:latest
+    hostname: text-filter-service
+    container_name: text-filter-service
+    ports:
+      - 9090:9090
+    restart: always
+    deploy:
+      resources:
+          limits:
+            cpus: 8.00

@@ -1,0 +1,10 @@
+aiohttp==3.6.2            # via -r requirements.in
+async-timeout==3.0.1      # via aiohttp
+asyncio==3.4.3            # via -r requirements.in
+attrs==19.3.0             # via aiohttp
+chardet==3.0.4            # via aiohttp
+idna-ssl==1.1.0           # via aiohttp
+idna==2.10                # via idna-ssl, yarl
+multidict==4.7.6          # via aiohttp, yarl
+typing-extensions==3.7.4.2  # via aiohttp
+yarl==1.4.2               # via aiohttp

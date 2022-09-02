@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: social-network-ml-client
+  labels:
+    name: social-network-ml-client
+spec:
+  selector:
+    matchLabels:
+      name: social-network-ml-client
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: social-network-ml-client
+    spec:
+      containers:
+        - name: social-network-ml-client
+          image: localhost:5000/social-network-ml-client:latest
+          command: ["python3"]
+          args: ["/workspace/sleep.py"]
+      restartPolicy: Always

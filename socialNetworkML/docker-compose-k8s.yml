@@ -1,0 +1,264 @@
+# Replace localhost:5000 with your registry url
+version: "3"
+services:
+  social-graph-service:
+    image: ${DOCKER_REGISTRY:-localhost:5000}/social-network-ml-microservices:latest
+    hostname: social-graph-service
+    ports:
+      - 9090:9090
+    depends_on:
+      - jaeger
+      - social-graph-mongodb
+    restart: always
+    entrypoint: SocialGraphService
+
+  social-graph-mongodb:
+    image: ${DOCKER_REGISTRY:-localhost:5000}/mongo:4.4.6
+    hostname: social-graph-mongodb
+    ports:
+      - 27017:27017
+    restart: always
+    command: --config /social-network-microservices/config/mongod.conf
+
+  social-graph-redis:
+    image: ${DOCKER_REGISTRY:-localhost:5000}/redis:6.2.4
+    hostname: social-graph-redis
+    ports:
+      - 6379:6379
+    restart: always
+    command: /social-network-microservices/config/redis.conf
+
+  home-timeline-redis:
+    image: ${DOCKER_REGISTRY:-localhost:5000}/redis:6.2.4
+    hostname: home-timeline-redis
+    ports:
+      - 6379:6379
+    restart: always
+    command: /social-network-microservices/config/redis.conf
+
+  compose-post-service:
+    image: ${DOCKER_REGISTRY:-localhost:5000}/social-network-ml-microservices:latest
+    hostname: compose-post-service
+    ports:
+      - 9090:9090
+    restart: always
+    depends_on:
+      - jaeger
+    entrypoint: ComposePostService
+
+  post-storage-service:
+    image: ${DOCKER_REGISTRY:-localhost:5000}/social-network-ml-microservices:latest
+    hostname: post-storage-service
+    ports:
+      - 9090:9090
+    restart: always
+    depends_on:
+      - jaeger
+      - post-storage-mongodb
+    entrypoint: PostStorageService
+
+  post-storage-memcached:
+    image: ${DOCKER_REGISTRY:-localhost:5000}/memcached:1.6.7
+    hostname: post-storage-memcached
+    ports:
+      - 11211:11211
+    restart: always
+
+  post-storage-mongodb:
+    image: ${DOCKER_REGISTRY:-localhost:5000}/mongo:4.4.6
+    hostname: post-storage-mongodb
+    ports:
+      - 27017:27017
+    restart: always
+    command: --config /social-network-microservices/config/mongod.conf
+
+  user-timeline-service:
+    image: ${DOCKER_REGISTRY:-localhost:5000}/social-network-ml-microservices:latest
+    hostname: user-timeline-service
+    ports:
+      - 9090:9090
+    restart: always
+    depends_on:
+      - jaeger
+      - user-timeline-mongodb
+    entrypoint: UserTimelineService
+
+  user-timeline-redis:
+    image: ${DOCKER_REGISTRY:-localhost:5000}/redis:6.2.4
+    hostname: user-timeline-redis
+    ports:
+      - 6379:6379
+    restart: always
+    command: /social-network-microservices/config/redis.conf
+
+  user-timeline-mongodb:
+    image: ${DOCKER_REGISTRY:-localhost:5000}/mongo:4.4.6
+    hostname: user-timeline-mongodb
+    ports:
+      - 27017:27017
+    restart: always
+    command: --config /social-network-microservices/config/mongod.conf
+
+  url-shorten-service:
+    image: ${DOCKER_REGISTRY:-localhost:5000}/social-network-ml-microservices:latest
+    hostname: url-shorten-service
+    ports:
+      - 9090:9090
+    restart: always
+    entrypoint: UrlShortenService
+    depends_on:
+      - jaeger
+      - url-shorten-mongodb
+
+  # url-shorten-memcached:
+  #   image: ${DOCKER_REGISTRY:-localhost:5000}/memcached:1.6.7
+  #   hostname: url-shorten-memcached
+  #   ports:
+  #     - 11211:11211
+  #   restart: always
+
+  url-shorten-mongodb:
+    image: ${DOCKER_REGISTRY:-localhost:5000}/mongo:4.4.6
+    hostname: url-shorten-mongodb
+    ports:
+      - 27017:27017
+    restart: always
+    command: --config /social-network-microservices/config/mongod.conf
+
+  user-service:
+    image: ${DOCKER_REGISTRY:-localhost:5000}/social-network-ml-microservices:latest
+    hostname: user-service
+    ports:
+      - 9090:9090
+    restart: always
+    depends_on:
+      - jaeger
+      - user-mongodb
+    entrypoint: UserService
+
+  user-memcached:
+    image: ${DOCKER_REGISTRY:-localhost:5000}/memcached:1.6.7
+    hostname: user-memcached
+    ports:
+      - 11211:11211
+    restart: always
+
+  user-mongodb:
+    image: ${DOCKER_REGISTRY:-localhost:5000}/mongo:4.4.6
+    hostname: user-mongodb
+    ports:
+      - 27017:27017
+    restart: always
+    command: --config /social-network-microservices/config/mongod.conf
+
+  media-service:
+    image: ${DOCKER_REGISTRY:-localhost:5000}/social-network-ml-microservices:latest
+    hostname: media-service
+    ports:
+      - 9090:9090
+    depends_on:
+      - jaeger
+    restart: always
+    entrypoint: MediaService
+
+  media-filter-service:
+    image: ${DOCKER_REGISTRY:-localhost:5000}/social-network-media-filter-service:latest
+    hostname: media-filter-service
+    ports:
+      - 9090:9090
+    restart: always
+
+  # media-memcached:
+  #   image: ${DOCKER_REGISTRY:-localhost:5000}/memcached:1.6.7
+  #   hostname: media-memcached
+  #   ports:
+  #     - 11211:11211
+  #   restart: always
+
+  # media-mongodb:
+  #   image: ${DOCKER_REGISTRY:-localhost:5000}/mongo:4.4.6
+  #   hostname: media-mongodb
+  #   ports:
+  #     - 27017:27017
+  #   restart: always
+  #   command: --config /social-network-microservices/config/mongod.conf
+
+  text-service:
+    image: ${DOCKER_REGISTRY:-localhost:5000}/social-network-ml-microservices:latest
+    hostname: text-service
+    ports:
+      - 9090:9090
+    restart: always
+    depends_on:
+      - jaeger
+    entrypoint: TextService
+
+  text-filter-service:
+    image: ${DOCKER_REGISTRY:-localhost:5000}/social-network-text-filter-service:latest
+    hostname: text-filter-service
+    ports:
+      - 9090:9090
+    restart: always
+
+  unique-id-service:
+    image: ${DOCKER_REGISTRY:-localhost:5000}/social-network-ml-microservices:latest
+    hostname: unique-id-service
+    ports:
+      - 9090:9090
+    restart: always
+    depends_on:
+      - jaeger
+    entrypoint: UniqueIdService
+
+  user-mention-service:
+    image: ${DOCKER_REGISTRY:-localhost:5000}/social-network-ml-microservices:latest
+    hostname: user-mention-service
+    ports:
+      - 9090:9090
+    depends_on:
+      - jaeger
+    restart: always
+    entrypoint: UserMentionService
+
+  home-timeline-service:
+    image: ${DOCKER_REGISTRY:-localhost:5000}/social-network-ml-microservices:latest
+    hostname: home-timeline-service
+    ports:
+      - 9090:9090
+    depends_on:
+      - jaeger
+    restart: always
+    entrypoint: HomeTimelineService
+
+  nginx-thrift:
+    image: ${DOCKER_REGISTRY:-localhost:5000}/openresty-thrift-ml:xenial
+    hostname: nginx-thrift
+    ports:
+      - 8080:8080
+    depends_on:
+      - jaeger
+    restart: always
+
+  # media-frontend:
+  #   image: ${DOCKER_REGISTRY:-localhost:5000}/media-frontend:xenial
+  #   hostname: media-frontend
+  #   ports:
+  #     - 8080:8080
+  #   restart: always
+  #   depends_on:
+  #     - jaeger
+
+  jaeger:
+    image: ${DOCKER_REGISTRY:-localhost:5000}/jaegertracing-all-in-one:latest
+    hostname: jaeger
+    ports:
+      - 5775:5775/udp
+      - 6831:6831/udp
+      - 6832:6832/udp
+      - 5778:5778
+      - 16686:16686
+      - 14268:14268
+      - 9411:9411
+    restart: always
+    environment:
+      - COLLECTOR_ZIPKIN_HTTP_PORT=9411

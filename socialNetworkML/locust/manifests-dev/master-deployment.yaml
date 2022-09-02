@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: locust-master
+  labels:
+    name: locust
+    role: master
+spec:
+  selector:
+    matchLabels:
+      name: locust
+      role: master
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        name: locust
+        role: master
+    spec:
+      securityContext: {}
+      containers:
+      - name: locust-master
+        securityContext: {}
+        image: "localhost:5000/locust-ml:latest"
+        command: ["/bin/bash", "/docker-entrypoint.sh"]
+        # args: ["--config=/mnt/locust/configs/master.conf"]
+        imagePullPolicy: IfNotPresent
+        resources: {}
+        volumeMounts:
+          - name: docker-entrypoint
+            mountPath: /docker-entrypoint.sh
+          - name: src
+            mountPath: /mnt/locust/src
+          - name: lib
+            mountPath: /mnt/locust/lib
+          - name: configs
+            mountPath: /mnt/locust/configs
+          - name: data
+            mountPath: /mnt/locust/data
+          - name: logs
+            mountPath: /mnt/locust/logs
+        ports:
+          - containerPort: 8089
+            name: loc-master-web
+            protocol: TCP
+          - containerPort: 5557
+            name: loc-master-p1
+            protocol: TCP
+          - containerPort: 5558
+            name: loc-master-p2
+            protocol: TCP
+      restartPolicy: Always
+      volumes:
+        - name: docker-entrypoint
+          hostPath:
+            path: /home/user/DeathStarBench/socialNetworkML/locust/docker-entrypoint.sh
+            type: File
+        - name: src
+          hostPath:
+            path: /home/user/DeathStarBench/socialNetworkML/locust/src
+            type: Directory
+        - name: lib
+          hostPath:
+            path: /home/user/DeathStarBench/socialNetworkML/locust/lib
+            type: Directory
+        - name: configs
+          hostPath:
+            path: /home/user/DeathStarBench/socialNetworkML/locust/configs
+            type: Directory
+        - name: data
+          hostPath:
+            path: /home/user/DeathStarBench/socialNetworkML/locust/data
+            type: Directory
+        - name: logs
+          hostPath:
+            path: /home/user/locust
+            type: Directory
